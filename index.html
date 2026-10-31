@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CS2 Upgrade</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1218;--card:#181d27;--card2:#202736;--tx:#e8ecf3;--mut:#8b95a8;--ac:#ff8a1f;--ok:#2ecc71;--bad:#e74c3c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Tahoma,Vazirmatn,system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:980px;margin:auto;padding:12px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 0}
+h1{margin:0;font-size:20px;color:var(--ac)}
+.bal{background:var(--card);padding:6px 14px;border-radius:20px;font-weight:bold}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:8px 14px;background:var(--card2);color:var(--tx)}
+button.p{background:var(--ac);color:#111;font-weight:bold}
+button:disabled{opacity:.4;cursor:not-allowed}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav button{white-space:nowrap}
+nav button.on{background:var(--ac);color:#111;font-weight:bold}
+.pan{background:var(--card);border-radius:12px;padding:14px;margin:10px 0}
+.hide{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.it{background:var(--card2);border-radius:10px;padding:8px;text-align:center;border-bottom:3px solid #777;cursor:pointer;font-size:13px}
+.it.sel{outline:2px solid var(--ac)}
+.it .ic{font-size:28px}
+.it small{color:var(--mut);display:block;direction:ltr}
+.wheel{width:200px;height:200px;border-radius:50%;margin:12px auto;position:relative;border:4px solid var(--card2)}
+.needle{position:absolute;left:calc(50% - 2px);top:0;width:4px;height:50%;background:#fff;transform-origin:bottom center;border-radius:2px}
+.wc{position:absolute;inset:30%;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input{font:inherit;background:var(--card2);border:1px solid #333;color:var(--tx);border-radius:8px;padding:8px;width:110px}
+.msg{min-height:28px;text-align:center;font-weight:bold}
+.big{font-size:42px;text-align:center;font-weight:bold;margin:8px 0}
+a{color:var(--ac)}
+h2{font-size:16px;margin:0 0 8px}
+.mut{color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🔫 CS2 Upgrade</h1>
+  <div class="row"><span class="bal">💰 <span id="bal">0</span> سکه</span><button id="free">سکه رایگان</button><button id="reset">ریست</button><span id="usr" class="row"></span></div>
+</header>
+<p class="mut">بازی کاملاً مجازی با سکه‌ی فرضی؛ پول واقعی و اسکین واقعی در کار نیست.</p>
+<nav id="nav">
+  <button data-t="up" class="on">⬆️ آپگرید</button>
+  <button data-t="cs">📦 باز کردن کیس</button>
+  <button data-t="cf">🪙 شیر یا خط</button>
+  <button data-t="cr">📈 کرش</button>
+</nav>
+
+<section id="up" class="pan">
+  <h2>آپگرید: یک اسکین از انبارت انتخاب کن، بعد هدف را بزن</h2>
+  <div class="mut">اسکین خودت: <b id="selN">—</b> | هدف: <b id="tgtN">—</b></div>
+  <div class="wheel" id="wheel"><div class="needle" id="needle"></div><div class="wc" id="chance">—</div></div>
+  <div class="msg" id="upMsg"></div>
+  <div class="row" style="justify-content:center"><button class="p" id="upGo" disabled>آپگرید!</button></div>
+  <h2 style="margin-top:12px">اسکین‌های هدف</h2>
+  <div class="grid" id="targets"></div>
+</section>
+
+<section id="cs" class="pan hide">
+  <h2>کیس‌ها</h2>
+  <div class="grid" id="cases"></div>
+  <div class="big" id="csRes">🎁</div>
+  <div class="msg" id="csMsg"></div>
+</section>
+
+<section id="cf" class="pan hide">
+  <h2>شیر یا خط (CT یا T) — برد = دو برابر</h2>
+  <div class="row"><input id="cfBet" type="number" min="1" value="10"><button class="p" data-s="CT">CT</button><button class="p" data-s="T">T</button></div>
+  <div class="big" id="cfRes">🪙</div>
+  <div class="msg" id="cfMsg"></div>
+</section>
+
+<section id="cr" class="pan hide">
+  <h2>کرش — قبل از سقوط برداشت کن</h2>
+  <div class="row"><input id="crBet" type="number" min="1" value="10"><button class="p" id="crGo">شروع</button><button id="crOut" disabled>برداشت</button></div>
+  <div class="big" id="crM">1.00x</div>
+  <div class="msg" id="crMsg"></div>
+</section>
+
+<section class="pan">
+  <h2>انبار من (<span id="invN">0</span>)</h2>
+  <div class="grid" id="inv"></div>
+</section>
+</div>
+
+<script>
+var S=[["P250 | Sand Dune",4],["MP9 | Hot Rod",9],["Five-SeveN | Candy Apple",15],["USP-S | Cortex",25],["Glock-18 | Water Elemental",35],["AK-47 | Redline",70],["M4A1-S | Hyper Beast",110],["AWP | Asiimov",160],["Desert Eagle | Blaze",250],["AK-47 | Fire Serpent",600],["AWP | Dragon Lore",1500],["Karambit | Fade",3000],["M4A4 | Howl",5000],["Butterfly Knife | Doppler",8000]].map(function(a){return{n:a[0],p:a[1]}});
+var C=[{n:"کیس مبتدی",p:20},{n:"کیس حرفه‌ای",p:100},{n:"کیس طلایی",p:500}];
+var st={b:1000,inv:[1,3]},sel=-1,tgt=-1,busy=false;
+try{var x=JSON.parse(localStorage.getItem("cs2up"));if(x&&x.inv)st=x}catch(e){}
+var $=function(s){return document.querySelector(s)};
+var fmt=function(n){return (Math.round(n*100)/100).toLocaleString("fa-IR")};
+function col(p){return p<10?"#b0c3d9":p<30?"#5e98d9":p<100?"#4b69ff":p<300?"#8847ff":p<1000?"#d32ce6":p<3000?"#eb4b4b":"#e4ae39"}
+function ic(s){return s.p>=3000&&/Knife|Karambit/.test(s.n)?"🔪":"🔫"}
+var logged=false;
+function save(){try{localStorage.setItem("cs2up",JSON.stringify(st))}catch(e){}
+  if(logged)fetch("/api/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(st)}).catch(function(){})}
+function card(i,extra){var s=S[i];return '<div class="it'+(extra||"")+'" style="border-color:'+col(s.p)+'"><div class="ic">'+ic(s)+'</div>'+s.n+'<small>'+fmt(s.p)+' 💰</small></div>'}
+function render(){
+  $("#bal").textContent=fmt(st.b);$("#invN").textContent=fmt(st.inv.length);
+  var h="";st.inv.forEach(function(id,k){h+='<div data-k="'+k+'">'+card(id,k===sel?" sel":"").replace("</small>","</small><button data-sell=\""+k+"\" style=\"margin-top:4px;padding:2px 8px;font-size:12px\">فروش</button>")+'</div>'});
+  $("#inv").innerHTML=h||'<span class="mut">انبار خالی است؛ سکه رایگان بگیر یا کیس باز کن.</span>';
+  var t="";
+  if(sel>=0){S.forEach(function(s,i){if(s.p>S[st.inv[sel]].p&&s.p<=S[st.inv[sel]].p*20)t+='<div data-t="'+i+'">'+card(i,i===tgt?" sel":"")+'</div>'})}
+  $("#targets").innerHTML=t||'<span class="mut">اول از انبار یک اسکین انتخاب کن.</span>';
+  $("#selN").textContent=sel>=0?S[st.inv[sel]].n:"—";$("#tgtN").textContent=tgt>=0?S[tgt].n:"—";
+  var ch=calc();$("#chance").textContent=ch?ch.toFixed(1)+"%":"—";
+  $("#wheel").style.background=ch?"conic-gradient(var(--ok) 0 "+ch+"%, var(--bad) "+ch+"% 100%)":"var(--card2)";
+  $("#upGo").disabled=!ch||busy;save();
+}
+function calc(){if(sel<0||tgt<0)return 0;return Math.min(90,S[st.inv[sel]].p/S[tgt].p*95)}
+$("#inv").onclick=function(e){
+  var b=e.target.closest("[data-sell]");
+  if(b&&!busy){var k=+b.dataset.sell;st.b+=S[st.inv[k]].p;st.inv.splice(k,1);sel=-1;tgt=-1;render();return}
+  var d=e.target.closest("[data-k]");if(d&&!busy){sel=+d.dataset.k;tgt=-1;$("#upMsg").textContent="";render()}
+};
+$("#targets").onclick=function(e){var d=e.target.closest("[data-t]");if(d&&!busy){tgt=+d.dataset.t;render()}};
+$("#upGo").onclick=function(){
+  var ch=calc();if(!ch||busy)return;busy=true;var id=st.inv[sel],tg=tgt;
+  st.inv.splice(sel,1);sel=-1;tgt=-1;$("#upMsg").textContent="";
+  var r=Math.random()*100,n=$("#needle");
+  n.style.transition="none";n.style.transform="rotate(0deg)";n.offsetWidth;
+  n.style.transition="transform 4s cubic-bezier(.1,.7,.1,1)";n.style.transform="rotate("+(1800+r*3.6)+"deg)";
+  $("#upGo").disabled=true;
+  var wch=ch;
+  setTimeout(function(){
+    busy=false;
+    if(r<wch){st.inv.push(tg);$("#upMsg").innerHTML='<span style="color:var(--ok)">✅ برنده شدی: '+S[tg].n+'</span>'}
+    else $("#upMsg").innerHTML='<span style="color:var(--bad)">❌ باختی: '+S[id].n+' از دست رفت</span>';
+    render();
+  },4100);
+  render();$("#chance").textContent=wch.toFixed(1)+"%";
+};
+function weights(c){
+  var pool=[];S.forEach(function(s,i){if(s.p>=c/3&&s.p<=c*10)pool.push(i)});
+  for(var k=1;k<5;k+=.1){
+    var w=pool.map(function(i){return Math.pow(S[i].p,-k)}),sw=0,ev=0;
+    w.forEach(function(v,j){sw+=v;ev+=v*S[pool[j]].p});
+    if(ev/sw<=c*.92||k>4.8)return{pool:pool,w:w,sw:sw};
+  }
+}
+var ch="";C.forEach(function(c,i){ch+='<div class="it" style="border-color:var(--ac)"><div class="ic">📦</div>'+c.n+'<small>'+fmt(c.p)+' 💰</small><button class="p" data-c="'+i+'" style="margin-top:4px">باز کن</button></div>'});
+$("#cases").innerHTML=ch;
+$("#cases").onclick=function(e){
+  var b=e.target.closest("[data-c]");if(!b||busy)return;
+  var c=C[+b.dataset.c];if(st.b<c.p){$("#csMsg").textContent="سکه کافی نیست";return}
+  busy=true;st.b-=c.p;var W=weights(c.p),r=Math.random()*W.sw,pick=W.pool[0];
+  for(var j=0;j<W.pool.length;j++){r-=W.w[j];if(r<=0){pick=W.pool[j];break}}
+  var n=0,iv=setInterval(function(){
+    var s=S[W.pool[Math.floor(Math.random()*W.pool.length)]];
+    $("#csRes").innerHTML=ic(s)+'<div style="font-size:14px;color:'+col(s.p)+'">'+s.n+'</div>';
+    if(++n>22){clearInterval(iv);var f=S[pick];st.inv.push(pick);busy=false;
+      $("#csRes").innerHTML=ic(f)+'<div style="font-size:16px;color:'+col(f.p)+'">'+f.n+'</div>';
+      $("#csMsg").textContent="گرفتی: "+f.n+" ("+fmt(f.p)+" سکه)";render()}
+  },90);render();
+};
+$("#cf").onclick=function(e){
+  var b=e.target.closest("[data-s]");if(!b||busy)return;
+  var bet=Math.floor(+$("#cfBet").value);if(!(bet>0)||bet>st.b){$("#cfMsg").textContent="مقدار شرط درست نیست";return}
+  busy=true;st.b-=bet;render();$("#cfRes").textContent="🪙…";
+  setTimeout(function(){
+    var res=Math.random()<.5?"CT":"T";$("#cfRes").textContent=res;busy=false;
+    if(res===b.dataset.s){st.b+=bet*2;$("#cfMsg").innerHTML='<span style="color:var(--ok)">بردی! +'+fmt(bet)+'</span>'}
+    else $("#cfMsg").innerHTML='<span style="color:var(--bad)">باختی −'+fmt(bet)+'</span>';
+    render();
+  },900);
+};
+var crT=null,crBet=0,crM=1,crCp=1;
+$("#crGo").onclick=function(){
+  var bet=Math.floor(+$("#crBet").value);if(crT||busy||!(bet>0)||bet>st.b){$("#crMsg").textContent="مقدار شرط درست نیست";return}
+  crBet=bet;st.b-=bet;crM=1;crCp=Math.min(100,Math.max(1,.96/(1-Math.random())));
+  $("#crGo").disabled=true;$("#crOut").disabled=false;$("#crMsg").textContent="";render();
+  crT=setInterval(function(){
+    crM*=1.012;
+    if(crM>=crCp){clearInterval(crT);crT=null;$("#crM").textContent=crCp.toFixed(2)+"x";$("#crM").style.color="var(--bad)";
+      $("#crMsg").innerHTML='<span style="color:var(--bad)">💥 سقوط کرد! −'+fmt(crBet)+'</span>';
+      $("#crGo").disabled=false;$("#crOut").disabled=true;render()}
+    else{$("#crM").style.color="var(--ok)";$("#crM").textContent=crM.toFixed(2)+"x"}
+  },60);
+};
+$("#crOut").onclick=function(){
+  if(!crT)return;clearInterval(crT);crT=null;var w=crBet*crM;st.b+=w;
+  $("#crMsg").innerHTML='<span style="color:var(--ok)">برداشت کردی: +'+fmt(w-crBet)+'</span>';
+  $("#crGo").disabled=false;$("#crOut").disabled=true;render();
+};
+$("#nav").onclick=function(e){
+  var b=e.target.closest("[data-t]");if(!b)return;
+  document.querySelectorAll("#nav button").forEach(function(x){x.classList.toggle("on",x===b)});
+  ["up","cs","cf","cr"].forEach(function(id){$("#"+id).classList.toggle("hide",id!==b.dataset.t)});
+};
+$("#free").onclick=function(){if(st.b<20){st.b+=200;render()}else alert("وقتی کمتر از ۲۰ سکه داری می‌توانی سکه رایگان بگیری")};
+$("#reset").onclick=function(){if(confirm("همه چیز ریست شود؟")){st={b:1000,inv:[1,3]};sel=-1;tgt=-1;render()}};
+fetch("/api/me").then(function(r){return r.json()}).then(function(d){
+  var u=$("#usr");
+  if(d.user){logged=true;if(d.state)st=d.state;
+    var im=document.createElement("img");im.src=d.user.avatar;im.width=28;im.height=28;im.style.borderRadius="50%";
+    var sp=document.createElement("span");sp.textContent=d.user.name;
+    var a=document.createElement("a");a.href="/logout";a.textContent="خروج";
+    u.append(im,sp,a);
+  }else{var l=document.createElement("a");l.href="/auth/steam";l.textContent="ورود با استیم";l.className="bal";u.append(l)}
+  render();
+}).catch(function(){render()});
+</script>
+</body>
+</html>
